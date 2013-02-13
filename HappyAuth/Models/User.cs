@@ -8,6 +8,7 @@ namespace HappyAuth.Models
     /// <summary>
     /// A really happy User...
     /// </summary>
+    [Serializable]
     public class User
     {
         public long Id { get; set; }

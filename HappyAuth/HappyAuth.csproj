@@ -86,6 +86,7 @@
     <Compile Include="Controllers\CharactersController.cs" />
     <Compile Include="Controllers\Components\OAuthComponent.cs" />
     <Compile Include="Controllers\OAuthController.cs" />
+    <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -94,6 +95,7 @@
     <Compile Include="Libs\OAuthAuthorizationManager.cs" />
     <Compile Include="Libs\OAuthConsumer.cs" />
     <Compile Include="Libs\OAuthMessageFactory.cs" />
+    <Compile Include="Libs\OAuthScopes.cs" />
     <Compile Include="Libs\OAuthServiceProvider.cs" />
     <Compile Include="Libs\OAuthToken.cs" />
     <Compile Include="Libs\RequestScopedTokenMessage.cs" />

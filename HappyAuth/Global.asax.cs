@@ -63,6 +63,12 @@ namespace HappyAuth
                 "characters/{action}/{id}",
                 new { controller = "Characters", action = "Index", id = ""}
             );
+
+            routes.MapRoute(
+                "Profiles",
+                "profiles/{action}/{id}",
+                new { controller = "Profiles", action = "Index", id = ""}
+            );
         }
         protected void Application_BeginRequest(object sender, EventArgs args)
         {
@@ -105,7 +111,6 @@ namespace HappyAuth
             };
             Collections.Characters.Add(character);
             Collections.Consumers.Add(consumer);
-            Collections.Characters.Add(character);
             Collections.Users.Add(user);
         }
     }

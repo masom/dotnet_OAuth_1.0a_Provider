@@ -39,26 +39,12 @@ namespace HappyAuth.Libs
             var request = context.HttpContext.Request;
             var serviceProvider = OAuthServiceProvider.Create();
 
-            var auth = Authenticate(serviceProvider, request);
-            if (auth == null)
-            {
-                // No authentication provided.
-
-                if (_enforce)
-                {
-                    throw new HttpException((int)HttpStatusCode.Unauthorized, "Requires OAuth 1.0a");
-                }
-                
-                return;
-            }
-
+            var auth = Authenticate(serviceProvider, request, _enforce);
             var accessToken = MvcApplication.Collections.GetTokenFromToken(auth.AccessToken);
-            var scopeIsAuthorized = AuthorizedToAccessScope(context, accessToken.ScopeAsList);
 
-            if (!scopeIsAuthorized)
-            {
-                throw new HttpException((int) HttpStatusCode.Unauthorized, "Not Authorized");
-            }
+            VerifyScopeAccess(accessToken.User, context, accessToken.ScopeAsList);
+
+            context.RouteData.Values.Add("oauth_access_token", accessToken);
 
             base.OnActionExecuting(context);
         }
@@ -66,15 +52,20 @@ namespace HappyAuth.Libs
         /// <summary>
         /// Validates a consumer is authorized to access a resource based off it's allowed scope.
         /// </summary>
+        /// <param name="user"></param>
         /// <param name="context"></param>
         /// <param name="clientScopes"></param>
-        /// <returns></returns>
-        private bool AuthorizedToAccessScope(ActionExecutingContext context, String[] clientScopes)
+        /// <exception cref="HttpException"></exception>
+        private void VerifyScopeAccess(Object user, ActionExecutingContext context, String[] clientScopes)
         {
             var controllerScope = GetScopeFromType(context.Controller.GetType());
             var actionScope = GetScopeFromType(context.ActionDescriptor.GetType());
 
-            return EvaluateScope(controllerScope, clientScopes) && EvaluateScope(actionScope, clientScopes);
+            bool clientScopesValid = EvaluateScope(user, controllerScope, clientScopes) && EvaluateScope(user, actionScope, clientScopes);
+            if (!clientScopesValid)
+            {
+                throw new HttpException((int)HttpStatusCode.Unauthorized, "Not Authorized");
+            }
         }
 
         /// <summary>
@@ -83,7 +74,7 @@ namespace HappyAuth.Libs
         /// <param name="scope"><see cref="OAuthScope"/> instance being evaluated</param>
         /// <param name="consumerScopes">List of scopes the consumer has access to.</param>
         /// <returns>True if the consumer has access to the scope.</returns>
-        private bool EvaluateScope(OAuthScope scope, IEnumerable<string> consumerScopes)
+        private bool EvaluateScope(Object user, OAuthScope scope, IEnumerable<string> consumerScopes)
         {
             if (scope == null)
             {
@@ -94,6 +85,17 @@ namespace HappyAuth.Libs
             {
                 return true;
             }
+
+            /**
+             * If the requested scope is not destined to a consumer (no user has authorized access)
+             * but the requested resources is scoped differently (requires a user authorization)
+             * and there is no user associated with the access token, deny access.
+             */
+            if (scope.Scope != OAuthScopes.Consumer && user == null)
+            {
+                return false;
+            }
+
             return consumerScopes.Contains(scope.Scope);
         }
 
@@ -119,8 +121,9 @@ namespace HappyAuth.Libs
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="httpRequest"></param>
+        /// <exception cref="HttpException"></exception>
         /// <returns></returns>
-        private AccessProtectedResourceRequest Authenticate(ServiceProvider provider, HttpRequestBase httpRequest)
+        private AccessProtectedResourceRequest Authenticate(ServiceProvider provider, HttpRequestBase httpRequest, bool enforce)
         {
             AccessProtectedResourceRequest auth = null;
             try
@@ -129,8 +132,13 @@ namespace HappyAuth.Libs
             }
             catch (ProtocolException ex)
             {
-                //TODO Handle this
-                throw;
+                //TODO Log error
+                throw new HttpException((int) HttpStatusCode.Unauthorized, ex.Message);
+            }
+
+            if (auth == null && _enforce)
+            {
+                throw new HttpException((int)HttpStatusCode.Unauthorized, "Requires OAuth 1.0a");
             }
 
             return auth;

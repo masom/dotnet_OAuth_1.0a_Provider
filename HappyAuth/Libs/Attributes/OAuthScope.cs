@@ -22,5 +22,6 @@ namespace HappyAuth.Libs.Attributes
         {
             _scope = scope;
         }
+
     }
 }
