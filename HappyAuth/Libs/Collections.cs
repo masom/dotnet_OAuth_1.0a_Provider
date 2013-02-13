@@ -26,23 +26,36 @@ namespace HappyAuth.Libs
             Users = new List<User>();
         }
 
-        public OAuthToken GetTokenFromToken(string access_token)
+        public OAuthToken GetTokenFromToken(string token)
         {
-            if (String.IsNullOrEmpty(access_token))
+            if (String.IsNullOrEmpty(token))
             {
-                throw new ArgumentException("access_token cannot be empty");
+                throw new ArgumentException("token cannot be empty");
             }
 
-            return Tokens.FirstOrDefault(t => t.Token.Equals(access_token));
+            return Tokens.SingleOrDefault(t => t.Token.Equals(token));
         }
 
+        /// <summary>
+        /// Authorize a request token for a consumer.  (Client Grants)
+        /// </summary>
+        /// <param name="token"></param>
+        public void AuthorizeRequestToken(OAuthToken token)
+        {
+            token.Authorize(null);
+        }
+
+        /// <summary>
+        /// Authorize a request token for a user.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="user"></param>
         public void AuthorizeRequestToken(OAuthToken token, User user)
         {
-            if (!token.State.Equals(TokenAuthorizationState.UnauthorizedRequestToken))
+            if (token == null)
             {
-                throw new Exception("The token state does not match unauthorized request.");
+                throw new ArgumentException("token cannot be null");
             }
-
             token.Authorize(user);
         }
 
@@ -63,7 +76,7 @@ namespace HappyAuth.Libs
         #region IServiceProviderTokenManager
         IServiceProviderAccessToken IServiceProviderTokenManager.GetAccessToken(string token)
         {
-            var entity = Tokens.FirstOrDefault(t => t.Token.Equals(token) && t.State.Equals(TokenAuthorizationState.AccessToken));
+            var entity = Tokens.SingleOrDefault(t => t.Token.Equals(token) && t.State.Equals(TokenAuthorizationState.AccessToken));
             if (entity == null)
             {
                 throw new KeyNotFoundException();
@@ -79,7 +92,7 @@ namespace HappyAuth.Libs
 
         IConsumerDescription IServiceProviderTokenManager.GetConsumer(string key)
         {
-            var consumer = Consumers.FirstOrDefault(c => c.Key.Equals(key));
+            var consumer = Consumers.SingleOrDefault(c => c.Key.Equals(key));
             if (consumer == null)
             {
                 throw new KeyNotFoundException();
@@ -90,7 +103,7 @@ namespace HappyAuth.Libs
 
         IServiceProviderRequestToken IServiceProviderTokenManager.GetRequestToken(string request_token)
         {
-            var token = Tokens.FirstOrDefault(t => t.Token == request_token && t.State != TokenAuthorizationState.AccessToken);
+            var token = Tokens.SingleOrDefault(t => t.Token == request_token && t.State != TokenAuthorizationState.AccessToken);
             if (token == null)
             {
                 throw new KeyNotFoundException();
@@ -144,6 +157,7 @@ namespace HappyAuth.Libs
 
         void ITokenManager.StoreNewRequestToken(UnauthorizedTokenRequest request, ITokenSecretContainingMessage response)
         {
+            
             var scopedRequest = (RequestScopedTokenMessage) request;
             var consumer = Consumers.Single(c => c.Key.Equals(request.ConsumerKey));
             var token = new OAuthToken
@@ -154,6 +168,11 @@ namespace HappyAuth.Libs
                 IssueDate = DateTime.UtcNow,
                 Scope = scopedRequest.Scope
             };
+
+            if (Tokens.FirstOrDefault(t => t.Token == response.Token) != null)
+            {
+                throw new ArgumentException("The token already exists.");
+            }
 
             Tokens.Add(token);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using HappyAuth.Libs;
@@ -26,7 +27,6 @@ namespace HappyAuth
         {
             Logs.Add(msg);
         }
-
 
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
@@ -64,12 +64,18 @@ namespace HappyAuth
                 new { controller = "Characters", action = "Index", id = ""}
             );
         }
+        protected void Application_BeginRequest(object sender, EventArgs args)
+        {
+            System.Diagnostics.Debug.WriteLine(Request.RawUrl);
+        }
 
         protected void Application_Start()
         {
+            System.Diagnostics.Debug.WriteLine("Started");
             log4net.Config.XmlConfigurator.Configure();
 
             AreaRegistration.RegisterAllAreas();
+
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);

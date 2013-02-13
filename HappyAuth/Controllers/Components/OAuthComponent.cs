@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Web;
+using System.Web.Mvc;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth.Messages;
 using DotNetOpenAuth.OAuth;
@@ -14,11 +16,11 @@ namespace HappyAuth.Controllers.Components
     public class OAuthComponent
     {
         private static readonly RandomNumberGenerator CryptoRandomDataGenerator = new RNGCryptoServiceProvider();
-        private readonly ServiceProvider serviceProvider;
+        private readonly ServiceProvider _serviceProvider;
 
         public OAuthComponent(ServiceProvider provider)
         {
-            serviceProvider = provider;
+            _serviceProvider = provider;
         }
 
         /// <summary>
@@ -26,18 +28,19 @@ namespace HappyAuth.Controllers.Components
         /// </summary>
         /// <param name="request"></param>
         /// <param name="token"></param>
+        /// <exception cref="HttpException"></exception>
         public void HandleConsumerAuthorization(UserAuthorizationRequest request, OAuthToken token)
         {
             var user = MvcApplication.Collections.Users.First();
             MvcApplication.Collections.AuthorizeRequestToken(token, user);
-            var response = serviceProvider.PrepareAuthorizationResponse(request);
+            var response = _serviceProvider.PrepareAuthorizationResponse(request);
             if (response == null)
             {
                 //Something weird happened...
                 throw new HttpException((int)HttpStatusCode.BadRequest, "Something weird happened");
             }
 
-            serviceProvider.Channel.Respond(response);
+            _serviceProvider.Channel.Respond(response);
         }
 
         /// <summary>
@@ -49,7 +52,7 @@ namespace HappyAuth.Controllers.Components
             // Generate an unpredictable secret that goes to the user agent and must come back
             // with authorization to guarantee the user interacted with this page rather than
             // being scripted by an evil Consumer.
-            byte[] randomData = new byte[8];
+            var randomData = new byte[8];
             CryptoRandomDataGenerator.GetBytes(randomData);
             var authorization_secret = Convert.ToBase64String(randomData);
             return authorization_secret;
@@ -61,6 +64,7 @@ namespace HappyAuth.Controllers.Components
         /// <param name="Session"></param>
         /// <param name="consumer_id"></param>
         /// <param name="authorization_secret"></param>
+        /// <exception cref="HttpException"></exception>
         /// <returns></returns>
         public UserAuthorizationRequest ParseSession(HttpSessionStateBase Session, long consumer_id, string authorization_secret)
         {
@@ -85,10 +89,11 @@ namespace HappyAuth.Controllers.Components
         /// Parse an authorization request, modifying the provided <see cref="UserAuthorizationRequest"/> object.
         /// </summary>
         /// <param name="request"></param>
+        /// <exception cref="HttpException"></exception>
         /// <returns></returns>
         public OAuthToken ParseAuthorizationRequest(ref UserAuthorizationRequest request)
         {
-            request = serviceProvider.ReadAuthorizationRequest();
+            request = _serviceProvider.ReadAuthorizationRequest();
             if (request == null)
             {
                 throw new HttpException((int)HttpStatusCode.BadRequest, "Missing authorization request");
@@ -107,19 +112,33 @@ namespace HappyAuth.Controllers.Components
         /// <summary>
         /// Process a token request and generates a response.
         /// </summary>
-        public void ProcessTokenRequest()
+        /// <exception cref="HttpException"></exception>
+        public ActionResult ProcessTokenRequest()
         {
-            UnauthorizedTokenRequest request;
+            UnauthorizedTokenRequest tokenRequest;
             try
             {
-                request = serviceProvider.ReadTokenRequest();
+                tokenRequest = _serviceProvider.ReadTokenRequest();
             }
             catch (ProtocolException ex)
             {
-                throw;
+                const string template = "Invalid authentication data. Reason: {0}";
+                throw new HttpException((int) HttpStatusCode.Unauthorized, String.Format(template, ex.Message));
             }
-            var response = serviceProvider.PrepareUnauthorizedTokenMessage(request);
-            serviceProvider.Channel.Respond(response);
+
+            var tokenResponse = _serviceProvider.PrepareUnauthorizedTokenMessage(tokenRequest);
+            var response = _serviceProvider.Channel.PrepareResponse(tokenResponse);
+
+            if (((RequestScopedTokenMessage) tokenRequest).AuthMode == "consumer")
+            {
+                var issuedToken = ((ITokenContainingMessage)tokenResponse).Token;
+                var token = MvcApplication.Collections.GetTokenFromToken(issuedToken);
+
+                //Authorize the reques token but do not associate any users with it.
+                MvcApplication.Collections.AuthorizeRequestToken(token, null);
+            }
+
+            return response.AsActionResult();
         }
     }
 }

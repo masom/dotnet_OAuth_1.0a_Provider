@@ -55,13 +55,27 @@ namespace HappyAuth.Libs
             return TokenType.RequestToken;
         }
 
+        #region IServiceProviderRequestToken        
+
+        /// <summary>
+        /// Authorize the token for a given user.
+        /// If the user is null, the token will be authorized but not associated with a user.
+        /// </summary>
+        /// <param name="user"></param>
         public void Authorize(User user)
         {
-            State = TokenAuthorizationState.AuthorizedRequestToken;
+            Authorize();
             User = user;
         }
 
-        #region IServiceProviderRequestToken        
+        protected void Authorize()
+        {
+            if (!State.Equals(TokenAuthorizationState.UnauthorizedRequestToken))
+            {
+                throw new Exception("The token state does not match unauthorized request.");
+            }
+            State = TokenAuthorizationState.AuthorizedRequestToken;
+        }
 
         String IServiceProviderRequestToken.Token
         {

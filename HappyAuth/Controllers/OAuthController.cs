@@ -65,9 +65,9 @@ namespace HappyAuth.Controllers
 
         //
         // GET: /oauth/request_token
-        public void RequestToken()
+        public ActionResult RequestToken()
         {
-            oAuthComponent.ProcessTokenRequest();
+            return oAuthComponent.ProcessTokenRequest();
         }
 
         public JsonResult Description()
