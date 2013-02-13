@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Controllers\CharactersController.cs" />
     <Compile Include="Controllers\Components\OAuthComponent.cs" />
+    <Compile Include="Controllers\GamesController.cs" />
     <Compile Include="Controllers\OAuthController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Global.asax.cs">

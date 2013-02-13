@@ -5,19 +5,25 @@ using System.Web;
 
 namespace HappyAuth.Libs.Attributes
 {
+    /// <summary>
+    /// Define a required scope to access a resource.
+    /// </summary>
     public class OAuthScope : Attribute
     {
-        private string _scope;
+        /// <summary>
+        /// Scope required to access a resource.
+        /// </summary>
+        private readonly string _scope;
+
         public string Scope
         {
             get { return _scope; }
         }
 
-        public OAuthScope()
-        {
-            _scope = null;
-        }
-
+        /// <summary>
+        /// Defines a required scope to access a resource.
+        /// </summary>
+        /// <param name="scope">The required scope.</param>
         public OAuthScope(string scope)
         {
             _scope = scope;

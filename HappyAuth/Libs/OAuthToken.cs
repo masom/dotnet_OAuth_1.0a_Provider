@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using DotNetOpenAuth.OAuth.ChannelElements;
 using HappyAuth.Models;
 
@@ -29,7 +30,7 @@ namespace HappyAuth.Libs
         {
             get
             {
-                return Scope.Split('|');
+                return Scope.Split(',').Select(s => s.Trim()).ToArray();
             }
         }
 

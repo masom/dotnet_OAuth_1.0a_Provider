@@ -17,6 +17,12 @@ namespace HappyAuth.Libs
     public class OAuthAuthorizationManager : ActionFilterAttribute
     {
         /// <summary>
+        /// The RouteData key the current <see cref="OAuthToken"/> will be saved to.
+        /// TODO There should be a better place to store this.
+        /// </summary>
+        public static readonly string TokenRouteKey = "oauth_access_token";
+
+        /// <summary>
         /// Determine if the OAuth authentication is enforced.
         /// </summary>
         private readonly bool _enforce;
@@ -39,13 +45,7 @@ namespace HappyAuth.Libs
             var request = context.HttpContext.Request;
             var serviceProvider = OAuthServiceProvider.Create();
 
-            var auth = Authenticate(serviceProvider, request, _enforce);
-            var accessToken = MvcApplication.Collections.GetTokenFromToken(auth.AccessToken);
-
-            VerifyScopeAccess(accessToken.User, context, accessToken.ScopeAsList);
-
-            context.RouteData.Values.Add("oauth_access_token", accessToken);
-
+            Authenticate(context, serviceProvider, request, _enforce);
             base.OnActionExecuting(context);
         }
 
@@ -119,11 +119,12 @@ namespace HappyAuth.Libs
         /// <summary>
         /// Authenticate a request against a service provider.
         /// </summary>
+        /// <param name="context"></param>
         /// <param name="provider"></param>
         /// <param name="httpRequest"></param>
         /// <exception cref="HttpException"></exception>
         /// <returns></returns>
-        private AccessProtectedResourceRequest Authenticate(ServiceProvider provider, HttpRequestBase httpRequest, bool enforce)
+        private void Authenticate(ActionExecutingContext context, ServiceProvider provider, HttpRequestBase httpRequest, bool enforce)
         {
             AccessProtectedResourceRequest auth = null;
             try
@@ -136,12 +137,18 @@ namespace HappyAuth.Libs
                 throw new HttpException((int) HttpStatusCode.Unauthorized, ex.Message);
             }
 
-            if (auth == null && _enforce)
+            if (auth == null)
             {
-                throw new HttpException((int)HttpStatusCode.Unauthorized, "Requires OAuth 1.0a");
+                if (_enforce)
+                {
+                    throw new HttpException((int)HttpStatusCode.Unauthorized, "Requires OAuth 1.0a");
+                }
+                return;
             }
 
-            return auth;
+            var accessToken = MvcApplication.Collections.GetTokenFromToken(auth.AccessToken);
+            VerifyScopeAccess(accessToken.User, context, accessToken.ScopeAsList);
+            context.RouteData.Values.Add(TokenRouteKey, accessToken);
         }
     }
 }

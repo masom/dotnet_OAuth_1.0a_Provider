@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth.Messages;
 using DotNetOpenAuth.OAuth;
@@ -17,6 +18,9 @@ namespace HappyAuth.Controllers.Components
     {
         private static readonly RandomNumberGenerator CryptoRandomDataGenerator = new RNGCryptoServiceProvider();
         private readonly ServiceProvider _serviceProvider;
+
+        public OAuthComponent()
+        {}
 
         public OAuthComponent(ServiceProvider provider)
         {
@@ -139,6 +143,30 @@ namespace HappyAuth.Controllers.Components
             }
 
             return response.AsActionResult();
+        }
+
+        /// <summary>
+        /// Extract the user an OAuth request is made on the behalf of.
+        /// 
+        /// TODO This should probably be moved to a extension method OR some way to dynamically assign.
+        /// </summary>
+        /// <param name="routeData">Controller's <see cref="RouteData"/> possibly containing an <see cref="OAuthToken"/>.</param>
+        /// <returns>The <see cref="Models.User"/> this request is being made on the behalf of.</returns>
+        public Models.User GetUser(RouteData routeData)
+        {
+            if (!routeData.Values.Keys.Contains(OAuthAuthorizationManager.TokenRouteKey))
+            {
+                return null;
+            }
+
+            var accessToken = routeData.Values[OAuthAuthorizationManager.TokenRouteKey] as OAuthToken;
+            if (accessToken == null)
+            {
+                return null;
+            }
+
+            //AccessToken should really only contain a user id instead of a pure object reference.
+            return accessToken.User;
         }
     }
 }
