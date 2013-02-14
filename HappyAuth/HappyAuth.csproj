@@ -94,7 +94,8 @@
     </Compile>
     <Compile Include="Libs\Attributes\OAuthScope.cs" />
     <Compile Include="Libs\Collections.cs" />
-    <Compile Include="Libs\OAuthAuthorizationManager.cs" />
+    <Compile Include="Libs\Interfaces\IOAuthScope.cs" />
+    <Compile Include="Libs\Attributes\OAuthAuthorizationManager.cs" />
     <Compile Include="Libs\OAuthConsumer.cs" />
     <Compile Include="Libs\OAuthMessageFactory.cs" />
     <Compile Include="Libs\OAuthScopes.cs" />

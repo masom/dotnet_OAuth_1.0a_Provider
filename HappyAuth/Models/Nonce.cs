@@ -5,8 +5,6 @@ namespace HappyAuth.Models
 {
     /// <summary>
     /// A somewhat happy Nonce
-    /// 
-    /// TODO: Figure out what Nonce stands for...
     /// </summary>
     public class Nonce
     {

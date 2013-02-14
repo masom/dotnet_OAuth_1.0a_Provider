@@ -7,6 +7,8 @@ namespace HappyAuth.Libs
 {
     /// <summary>
     /// Defines different possible OAuth scopes.
+    /// 
+    /// Scopes other than Consumer requires the consumer to have a user's authorization.
     /// </summary>
     public static class OAuthScopes
     {

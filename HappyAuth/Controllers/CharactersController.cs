@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Mvc;
 using HappyAuth.Controllers.Components;
 using HappyAuth.Libs;
+using HappyAuth.Libs.Attributes;
 
 namespace HappyAuth.Controllers
 {
@@ -11,8 +12,7 @@ namespace HappyAuth.Controllers
     /// This controller requires the User scope.
     /// Some specific actions will required other scopes such has `character`.
     /// </summary>
-    [OAuthAuthorizationManager]
-    [Libs.Attributes.OAuthScope(OAuthScopes.User)]
+    [OAuthAuthorizationManager(OAuthScopes.User)]
     public class CharactersController : Controller
     {
         private readonly OAuthComponent oAuthComponent;

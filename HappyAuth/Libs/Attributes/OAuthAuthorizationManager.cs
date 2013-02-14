@@ -8,14 +8,14 @@ using System.Web.Mvc;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth;
 using DotNetOpenAuth.OAuth.Messages;
-using HappyAuth.Libs.Attributes;
+using HappyAuth.Libs.Interfaces;
 
-namespace HappyAuth.Libs
+namespace HappyAuth.Libs.Attributes
 {
     /// <summary>
     /// Handles OAuth authentication against a resource. Can be a Controller or an Action.
     /// </summary>
-    public class OAuthAuthorizationManager : ActionFilterAttribute
+    public class OAuthAuthorizationManager : ActionFilterAttribute, IOAuthScope
     {
         /// <summary>
         /// The RouteData key the current <see cref="OAuthToken"/> will be saved to.
@@ -28,13 +28,25 @@ namespace HappyAuth.Libs
         /// </summary>
         private readonly bool _enforce;
 
+        /// <summary>
+        /// Defines a required scope to access a resource.
+        /// </summary>
+        private readonly string _scope;
+
+        public String Scope
+        {
+            get { return _scope; }
+        }
+
         /// <param name="enforce">
         ///     Determine if the OAuth authentication is enforced.
         ///     If set to false and the OAuth data is not present in a request, the access to the resource will be allowed.
         /// </param>
-        public OAuthAuthorizationManager(bool enforce = true)
+        /// <param name="scope">A scope needed to access the protected resource.</param>
+        public OAuthAuthorizationManager(string scope = "", bool enforce = true)
         {
             _enforce = enforce;
+            _scope = String.IsNullOrEmpty(scope) ? null : scope;
         }
 
         /// <summary>
@@ -62,21 +74,32 @@ namespace HappyAuth.Libs
             var controllerScope = GetScopeFromSubject(context.ActionDescriptor.ControllerDescriptor);
             var actionScope = GetScopeFromSubject(context.ActionDescriptor);
 
-            bool clientScopesValid = EvaluateScope(user, controllerScope, clientScopes) && EvaluateScope(user, actionScope, clientScopes);
+            var evaluatedScopes = new List<bool>
+                {
+                    // Evaluates the manager's assigned scope.
+                    EvaluateScope(user, this, clientScopes),
+                    EvaluateScope(user, controllerScope, clientScopes),
+                    EvaluateScope(user, actionScope, clientScopes)
+                };
+
+            // All scope evaluations must succeed.
+            var clientScopesValid = evaluatedScopes.All(b => b);
+
             if (!clientScopesValid)
             {
+                //TODO Log
                 throw new HttpException((int)HttpStatusCode.Unauthorized, "Not Authorized");
             }
         }
 
         /// <summary>
-        /// Evaluates a provided <see cref="OAuthScope"/> and determine if it is available to the provided scopes.
+        /// Evaluates a provided <see cref="IOAuthScope"/> and determine if it is available to the provided scopes.
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="scope"><see cref="OAuthScope"/> instance being evaluated</param>
+        /// <param name="scope"><see cref="IOAuthScope"/> instance being evaluated</param>
         /// <param name="consumerScopes">List of scopes the consumer has access to.</param>
         /// <returns>True if the consumer has access to the scope.</returns>
-        private bool EvaluateScope(Object user, OAuthScope scope, IEnumerable<string> consumerScopes)
+        private bool EvaluateScope(Object user, IOAuthScope scope, IEnumerable<string> consumerScopes)
         {
             if (scope == null)
             {
@@ -95,6 +118,7 @@ namespace HappyAuth.Libs
              */
             if (scope.Scope != OAuthScopes.Consumer && user == null)
             {
+                //TODO Log
                 return false;
             }
 
@@ -105,8 +129,8 @@ namespace HappyAuth.Libs
         /// Introspect a given type and return an <see cref="OAuthScope"/> if any.
         /// </summary>
         /// <param name="subject">An object to be inspected for a scope.</param>
-        /// <returns><see cref="OAuthScope"/> or null</returns>
-        private OAuthScope GetScopeFromSubject(ICustomAttributeProvider subject)
+        /// <returns>An object implementing <see cref="IOAuthScope"/> or null</returns>
+        private IOAuthScope GetScopeFromSubject(ICustomAttributeProvider subject)
         {
             var scope = subject.GetCustomAttributes(typeof(OAuthScope), true);
             if (!scope.Any())
@@ -143,6 +167,7 @@ namespace HappyAuth.Libs
             {
                 if (_enforce)
                 {
+                    //TODO Log
                     throw new HttpException((int)HttpStatusCode.Unauthorized, "Requires OAuth 1.0a");
                 }
                 return;

@@ -28,6 +28,9 @@ namespace HappyAuth.Controllers
         /// <summary>
         /// Really, this is rather pointless to only allow 2-legged to access this.
         /// but it shows how the requested scoped impacts resource access.
+        /// 
+        /// The Consumer scope is a "special" (see: hardcoded) scope wereas it is the only one not
+        /// requiring an associated user (2-legged).
         /// </summary>
         /// <returns></returns>
         [OAuthScope(scope: OAuthScopes.Consumer)]
