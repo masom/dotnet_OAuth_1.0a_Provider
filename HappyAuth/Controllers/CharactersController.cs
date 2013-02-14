@@ -9,10 +9,10 @@ using HappyAuth.Libs.Attributes;
 namespace HappyAuth.Controllers
 {
     /// <summary>
-    /// This controller requires the User scope.
-    /// Some specific actions will required other scopes such has `character`.
+    /// This controller requires the Character scope.
+    /// Some specific actions will required other scopes such has `CharacterDelete`.
     /// </summary>
-    [OAuthAuthorizationManager(OAuthScopes.User)]
+    [OAuthAuthorizationManager(OAuthScopes.Character)]
     public class CharactersController : Controller
     {
         private readonly OAuthComponent oAuthComponent;
@@ -44,17 +44,16 @@ namespace HappyAuth.Controllers
             return Json(character, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
-        public JsonResult Add()
+        [OAuthScope(OAuthScopes.CharacterDelete)]
+        public JsonResult Delete(long id)
         {
-            return Json("ok");
-        }
-
-        
-        [HttpPut]
-        public JsonResult Update()
-        {
-            return Json("ok");
+            Models.Character character = MvcApplication.Collections.Characters.FirstOrDefault(c => c.Id.Equals(id));
+            if (character == null)
+            {
+                throw new HttpException((int) HttpStatusCode.NotFound, "Character Not Found");
+            }
+            var deleted = MvcApplication.Collections.Characters.Remove(character);
+            return Json(deleted, JsonRequestBehavior.AllowGet);
         }
     }
 }
