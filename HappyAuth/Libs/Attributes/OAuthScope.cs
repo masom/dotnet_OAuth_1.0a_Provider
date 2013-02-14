@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace HappyAuth.Libs.Attributes
 {
@@ -22,6 +19,7 @@ namespace HappyAuth.Libs.Attributes
 
         /// <summary>
         /// Defines a required scope to access a resource.
+        /// The `scope` parameter should come from the <see cref="OAuthScopes" /> class constants.
         /// </summary>
         /// <param name="scope">The required scope.</param>
         public OAuthScope(string scope)

@@ -73,7 +73,7 @@ namespace HappyAuth.Libs
         {
             if (!State.Equals(TokenAuthorizationState.UnauthorizedRequestToken))
             {
-                throw new Exception("The token state does not match unauthorized request.");
+                throw new InvalidOperationException("The token state does not match unauthorized request.");
             }
             State = TokenAuthorizationState.AuthorizedRequestToken;
         }

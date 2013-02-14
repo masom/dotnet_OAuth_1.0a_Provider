@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using DotNetOpenAuth.Messaging;
@@ -58,8 +59,8 @@ namespace HappyAuth.Libs
         /// <exception cref="HttpException"></exception>
         private void VerifyScopeAccess(Object user, ActionExecutingContext context, String[] clientScopes)
         {
-            var controllerScope = GetScopeFromType(context.Controller.GetType());
-            var actionScope = GetScopeFromType(context.ActionDescriptor.GetType());
+            var controllerScope = GetScopeFromSubject(context.ActionDescriptor.ControllerDescriptor);
+            var actionScope = GetScopeFromSubject(context.ActionDescriptor);
 
             bool clientScopesValid = EvaluateScope(user, controllerScope, clientScopes) && EvaluateScope(user, actionScope, clientScopes);
             if (!clientScopesValid)
@@ -71,6 +72,7 @@ namespace HappyAuth.Libs
         /// <summary>
         /// Evaluates a provided <see cref="OAuthScope"/> and determine if it is available to the provided scopes.
         /// </summary>
+        /// <param name="user"></param>
         /// <param name="scope"><see cref="OAuthScope"/> instance being evaluated</param>
         /// <param name="consumerScopes">List of scopes the consumer has access to.</param>
         /// <returns>True if the consumer has access to the scope.</returns>
@@ -102,11 +104,11 @@ namespace HappyAuth.Libs
         /// <summary>
         /// Introspect a given type and return an <see cref="OAuthScope"/> if any.
         /// </summary>
-        /// <param name="type"><see cref="System.Type"/></param>
+        /// <param name="subject">An object to be inspected for a scope.</param>
         /// <returns><see cref="OAuthScope"/> or null</returns>
-        private OAuthScope GetScopeFromType(Type type)
+        private OAuthScope GetScopeFromSubject(ICustomAttributeProvider subject)
         {
-            var scope = type.GetCustomAttributes(typeof(OAuthScope), true);
+            var scope = subject.GetCustomAttributes(typeof(OAuthScope), true);
             if (!scope.Any())
             {
                 return null;

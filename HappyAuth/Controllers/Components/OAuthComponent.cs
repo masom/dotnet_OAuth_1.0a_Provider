@@ -36,7 +36,11 @@ namespace HappyAuth.Controllers.Components
         public void HandleConsumerAuthorization(UserAuthorizationRequest request, OAuthToken token)
         {
             var user = MvcApplication.Collections.Users.First();
+
+
             MvcApplication.Collections.AuthorizeRequestToken(token, user);
+
+
             var response = _serviceProvider.PrepareAuthorizationResponse(request);
             if (response == null)
             {
@@ -141,6 +145,9 @@ namespace HappyAuth.Controllers.Components
                 //Authorize the reques token but do not associate any users with it.
                 MvcApplication.Collections.AuthorizeRequestToken(token, null);
             }
+
+            //TODO If the client is pre-authorized, should we just authorize here or redirect?
+            //Pre-authorizing here kinda breaks the oauth flow but pre-authorized clients is not normal to begin with.
 
             return response.AsActionResult();
         }

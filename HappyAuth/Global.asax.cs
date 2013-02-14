@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using HappyAuth.Controllers;
 using HappyAuth.Libs;
 
 namespace HappyAuth
@@ -69,7 +70,33 @@ namespace HappyAuth
                 "profiles/{action}/{id}",
                 new { controller = "Profiles", action = "Index", id = ""}
             );
+            routes.MapRoute(
+                "Games",
+                "games/{action}/{id}",
+                new { controller = "Games", action = "Index", id = "" }
+            );
         }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            var httpContext = ((MvcApplication) sender).Context;
+            var exception = Server.GetLastError();
+            var isHttpException = (exception is HttpException);
+            var controller = new ErrorsController();
+            var routeData = new RouteData();
+            routeData.Values["controller"] = "Errors";
+            routeData.Values["action"] = "Index";
+
+            httpContext.ClearError();
+            httpContext.Response.Clear();
+            httpContext.Response.StatusCode = isHttpException ? ((HttpException)exception).GetHttpCode() : 500;
+            httpContext.Response.TrySkipIisCustomErrors = true;
+
+            var context = new RequestContext(new HttpContextWrapper(httpContext), routeData);
+            context.RouteData.Values["error"] = exception;
+            ((IController)controller).Execute(context);
+        }
+
         protected void Application_BeginRequest(object sender, EventArgs args)
         {
             System.Diagnostics.Debug.WriteLine(Request.RawUrl);

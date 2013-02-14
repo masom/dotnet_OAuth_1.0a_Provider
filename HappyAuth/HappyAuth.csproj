@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Controllers\CharactersController.cs" />
     <Compile Include="Controllers\Components\OAuthComponent.cs" />
+    <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Controllers\GamesController.cs" />
     <Compile Include="Controllers\OAuthController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
@@ -168,7 +169,9 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Views\OAuth\Authorize.cshtml" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
