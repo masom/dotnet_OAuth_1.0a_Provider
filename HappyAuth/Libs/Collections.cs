@@ -63,11 +63,13 @@ namespace HappyAuth.Libs
         bool INonceStore.StoreNonce(string context, string nonce, DateTime timestamp)
         {
             var curNonce = new Nonce(context, nonce, timestamp);
-            var exists = Nonces.FirstOrDefault(n => n.Hash.Equals(curNonce.Hash));
-            if (exists != null)
+            var exists = Nonces.Any(n => n.Hash.Equals(curNonce.Hash));
+            
+            if (exists)
             {
                 return false;
             }
+
             Nonces.Add(curNonce);
             return true;
         }

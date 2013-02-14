@@ -62,7 +62,7 @@ namespace HappyAuth.Libs
             /**
              * The second parameter is the TokenManager
              */
-            return new ServiceProvider(SelfDescription, MvcApplication.Collections, new OAuthMessageFactory(MvcApplication.Collections));
+            return new ServiceProvider(SelfDescription, MvcApplication.Collections, MvcApplication.Collections, new OAuthMessageFactory(MvcApplication.Collections));
         }
     }
 }
