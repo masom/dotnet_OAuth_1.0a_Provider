@@ -56,14 +56,14 @@ namespace HappyAuth.Controllers
         /// </summary>
         /// <param name="consumer_id"></param>
         /// <param name="authorization_secret"></param>
-        public void AuthorizeConsumer(long consumer_id, string authorization_secret)
+        public ActionResult AuthorizeConsumer(long consumer_id, string authorization_secret)
         {
             var request = oAuthComponent.ParseSession(Session, consumer_id, authorization_secret);
             var msg = (ITokenContainingMessage)request;
             var token = MvcApplication.Collections.GetTokenFromToken(msg.Token);
             try
             {
-                oAuthComponent.HandleConsumerAuthorization(request, token);
+                return oAuthComponent.HandleConsumerAuthorization(request, token);
             }
             catch (InvalidOperationException ex)
             {
@@ -87,14 +87,12 @@ namespace HappyAuth.Controllers
             {
                 try
                 {
-                    oAuthComponent.HandleConsumerAuthorization(request, token);
+                    return oAuthComponent.HandleConsumerAuthorization(request, token);
                 }
                 catch (InvalidOperationException ex)
                 {
                     throw new HttpException((int)HttpStatusCode.BadRequest, ex.Message);
                 }
-
-                return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
             }
 
             var authorization_secret = oAuthComponent.GenerateAuthorizationSecret();

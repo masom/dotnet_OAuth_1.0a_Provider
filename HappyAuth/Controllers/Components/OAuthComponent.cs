@@ -33,7 +33,7 @@ namespace HappyAuth.Controllers.Components
         /// <param name="request"></param>
         /// <param name="token"></param>
         /// <exception cref="HttpException"></exception>
-        public void HandleConsumerAuthorization(UserAuthorizationRequest request, OAuthToken token)
+        public ActionResult HandleConsumerAuthorization(UserAuthorizationRequest request, OAuthToken token)
         {
             var user = MvcApplication.Collections.Users.First();
 
@@ -48,7 +48,7 @@ namespace HappyAuth.Controllers.Components
                 throw new HttpException((int)HttpStatusCode.BadRequest, "Something weird happened");
             }
 
-            _serviceProvider.Channel.Respond(response);
+            return _serviceProvider.Channel.PrepareResponse(response).AsActionResult();
         }
 
         /// <summary>
