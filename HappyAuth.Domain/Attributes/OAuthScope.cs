@@ -1,7 +1,7 @@
 ﻿using System;
-using HappyAuth.Libs.Interfaces;
+using HappyAuth.Domain.Interfaces;
 
-namespace HappyAuth.Libs.Attributes
+namespace HappyAuth.Domain.Attributes
 {
     /// <summary>
     /// Define a required scope to access a resource.

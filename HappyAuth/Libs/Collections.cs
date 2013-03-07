@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using DotNetOpenAuth.OAuth.Messages;
 using DotNetOpenAuth.Messaging.Bindings;
 using DotNetOpenAuth.OAuth.ChannelElements;
+using HappyAuth.Domain;
 using HappyAuth.Models;
 
 namespace HappyAuth.Libs
@@ -42,7 +44,7 @@ namespace HappyAuth.Libs
         /// <param name="token"></param>
         public void AuthorizeRequestToken(OAuthToken token)
         {
-            token.Authorize(null);
+            token.Authorize();
         }
 
         /// <summary>
@@ -56,7 +58,8 @@ namespace HappyAuth.Libs
             {
                 throw new ArgumentException("token cannot be null");
             }
-            token.Authorize(user);
+            var userId = (user == null) ? 0 : user.Id;
+            token.Authorize(userId);
         }
 
         #region INonceStore

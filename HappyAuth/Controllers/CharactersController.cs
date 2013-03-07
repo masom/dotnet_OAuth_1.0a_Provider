@@ -2,9 +2,10 @@
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using HappyAuth.Controllers.Attributes;
 using HappyAuth.Controllers.Components;
-using HappyAuth.Libs;
-using HappyAuth.Libs.Attributes;
+using HappyAuth.Domain;
+using HappyAuth.Domain.Attributes;
 
 namespace HappyAuth.Controllers
 {

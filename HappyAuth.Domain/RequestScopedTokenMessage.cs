@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth.Messages;
 
-namespace HappyAuth.Libs
+namespace HappyAuth.Domain
 {
+    /// <summary>
+    /// Custom OAuth request message used to pass a few custom attributes.
+    /// </summary>
     public class RequestScopedTokenMessage : UnauthorizedTokenRequest
     {
         public RequestScopedTokenMessage(MessageReceivingEndpoint endpoint, Version version)
@@ -20,6 +20,13 @@ namespace HappyAuth.Libs
         /// </summary>
         [MessagePart("authmode", IsRequired = false)]
         public string AuthMode { get; set; }
+
+        /// <summary>
+        /// Allows a client to directly submit a user's password.
+        /// This kindof defeat the point of OAuth but it is quite useful for your own clients.
+        /// </summary>
+        [MessagePart("password", IsRequired = false)]
+        public string Password { get; set; }
 
         /// <summary>
         /// Requested scope.
