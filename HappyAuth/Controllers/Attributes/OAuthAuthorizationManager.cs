@@ -176,7 +176,8 @@ namespace HappyAuth.Controllers.Attributes
             }
 
             var accessToken = MvcApplication.Collections.GetTokenFromToken(auth.AccessToken);
-            var user = MvcApplication.Collections.Users.FirstOrDefault(u => u.Id == long.Parse(accessToken.UserId));
+
+            var user = MvcApplication.Collections.Users.FirstOrDefault(u => u.Id == accessToken.UserId);
             VerifyScopeAccess(user, context, accessToken.ScopeAsList);
             context.RouteData.Values.Add(TokenRouteKey, accessToken);
         }

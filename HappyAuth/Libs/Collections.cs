@@ -44,7 +44,7 @@ namespace HappyAuth.Libs
         /// <param name="token"></param>
         public void AuthorizeRequestToken(OAuthToken token)
         {
-            token.Authorize(null);
+            token.Authorize();
         }
 
         /// <summary>
@@ -58,7 +58,8 @@ namespace HappyAuth.Libs
             {
                 throw new ArgumentException("token cannot be null");
             }
-            token.Authorize(user.Id.ToString(CultureInfo.InvariantCulture));
+            var userId = (user == null) ? 0 : user.Id;
+            token.Authorize(userId);
         }
 
         #region INonceStore

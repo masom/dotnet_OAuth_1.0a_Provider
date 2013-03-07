@@ -88,12 +88,13 @@ namespace HappyAuth.Controllers
                 try
                 {
                     oAuthComponent.HandleConsumerAuthorization(request, token);
-                }    
+                }
                 catch (InvalidOperationException ex)
                 {
                     throw new HttpException((int)HttpStatusCode.BadRequest, ex.Message);
                 }
-                return null;
+
+                return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
             }
 
             var authorization_secret = oAuthComponent.GenerateAuthorizationSecret();
@@ -105,8 +106,7 @@ namespace HappyAuth.Controllers
             ViewBag.ConsumerId = token.Consumer.Id;
             ViewBag.AuthorizationSecret = authorization_secret;
                 
-            return View();
-            
+            return View();            
         }
 
         //

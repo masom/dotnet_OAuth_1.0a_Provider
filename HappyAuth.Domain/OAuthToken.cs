@@ -54,7 +54,7 @@ namespace HappyAuth.Domain
         /// <summary>
         /// The user linked with this token.
         /// </summary>
-        public string UserId;
+        public long UserId;
 
         /// <summary>
         /// The verification code for this token.
@@ -98,8 +98,8 @@ namespace HappyAuth.Domain
         /// Authorize the token for a given user.
         /// If the user is null, the token will be authorized but not associated with a user.
         /// </summary>
-        /// <param name="userId"></param>
-        public void Authorize(string userId)
+        ///// <param name="userId"></param>
+        public void Authorize(long userId = 0)
         {
             if (!State.Equals(TokenAuthorizationState.UnauthorizedRequestToken))
             {

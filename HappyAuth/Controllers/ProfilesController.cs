@@ -24,8 +24,7 @@ namespace HappyAuth.Controllers
         public JsonResult Index()
         {
             //WARNING user could be null if the request is not made with OAuth.
-            var userId = oAuthComponent.GetUser(RouteData);
-            var user = MvcApplication.Collections.Users.FirstOrDefault(u => u.Id == long.Parse(userId));
+            var user = oAuthComponent.GetUser(RouteData);
             return Json(user, JsonRequestBehavior.AllowGet);
         }
 
