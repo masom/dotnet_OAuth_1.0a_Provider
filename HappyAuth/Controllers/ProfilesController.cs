@@ -1,7 +1,8 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
+using HappyAuth.Controllers.Attributes;
 using HappyAuth.Controllers.Components;
-using HappyAuth.Libs;
-using HappyAuth.Libs.Attributes;
+using HappyAuth.Domain;
 
 namespace HappyAuth.Controllers
 {
@@ -23,7 +24,8 @@ namespace HappyAuth.Controllers
         public JsonResult Index()
         {
             //WARNING user could be null if the request is not made with OAuth.
-            Models.User user = oAuthComponent.GetUser(RouteData);
+            var userId = oAuthComponent.GetUser(RouteData);
+            var user = MvcApplication.Collections.Users.FirstOrDefault(u => u.Id == long.Parse(userId));
             return Json(user, JsonRequestBehavior.AllowGet);
         }
 

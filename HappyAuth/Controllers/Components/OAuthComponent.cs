@@ -7,9 +7,9 @@ using System.Web.Routing;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth.Messages;
 using DotNetOpenAuth.OAuth;
-using HappyAuth.Libs;
+using HappyAuth.Controllers.Attributes;
+using HappyAuth.Domain;
 using System.Security.Cryptography;
-using HappyAuth.Libs.Attributes;
 
 namespace HappyAuth.Controllers.Components
 {
@@ -158,7 +158,7 @@ namespace HappyAuth.Controllers.Components
         /// </summary>
         /// <param name="routeData">Controller's <see cref="RouteData"/> possibly containing an <see cref="OAuthToken"/>.</param>
         /// <returns>The <see cref="Models.User"/> this request is being made on the behalf of.</returns>
-        public Models.User GetUser(RouteData routeData)
+        public string GetUser(RouteData routeData)
         {
             if (!routeData.Values.Keys.Contains(OAuthAuthorizationManager.TokenRouteKey))
             {
@@ -172,7 +172,7 @@ namespace HappyAuth.Controllers.Components
             }
 
             //AccessToken should really only contain a user id instead of a pure object reference.
-            return accessToken.User;
+            return accessToken.UserId;
         }
     }
 }

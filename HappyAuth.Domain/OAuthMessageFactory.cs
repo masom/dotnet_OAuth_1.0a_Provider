@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using DotNetOpenAuth.OAuth.ChannelElements;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth.Messages;
 
-namespace HappyAuth.Libs
+namespace HappyAuth.Domain
 {
     /// <summary>
     /// A custom class that will cause the OAuth library to use our custom message types

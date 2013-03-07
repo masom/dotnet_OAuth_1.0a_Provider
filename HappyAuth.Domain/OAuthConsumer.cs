@@ -3,7 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 using DotNetOpenAuth.OAuth;
 using DotNetOpenAuth.OAuth.ChannelElements;
 
-namespace HappyAuth.Libs
+namespace HappyAuth.Domain
 {
     /// <summary>
     /// Implements a happy OAuth Consumer representation.

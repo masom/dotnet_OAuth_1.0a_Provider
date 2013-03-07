@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace HappyAuth.Libs
+﻿namespace HappyAuth.Domain
 {
+    /// <summary>
+    /// Possible token authorization state values.
+    /// </summary>
     public enum TokenAuthorizationState : int
     {
         UnauthorizedRequestToken = 0,

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Web;
+using DotNetOpenAuth.Messaging.Bindings;
 using DotNetOpenAuth.OAuth;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth.ChannelElements;
 
-namespace HappyAuth.Libs
+namespace HappyAuth.Domain
 {
     public static class OAuthServiceProvider
     {
@@ -47,7 +48,7 @@ namespace HappyAuth.Libs
 
                 var description = new ServiceProviderDescription
                 {
-                    ProtocolVersion = DotNetOpenAuth.OAuth.ProtocolVersion.V10a,
+                    ProtocolVersion = ProtocolVersion.V10a,
                     AccessTokenEndpoint = new MessageReceivingEndpoint(accessMessageEndpoint, HttpDeliveryMethods.PostRequest),
                     RequestTokenEndpoint = new MessageReceivingEndpoint(requestMessageEndpoint, HttpDeliveryMethods.PostRequest),
                     UserAuthorizationEndpoint = new MessageReceivingEndpoint(userMessageEndpoint, HttpDeliveryMethods.GetRequest),
@@ -57,12 +58,16 @@ namespace HappyAuth.Libs
             }
         }
 
-        public static ServiceProvider Create()
+        /// <summary>
+        /// Creates an instance of a ServiceProvider.
+        /// </summary>
+        /// <returns></returns>
+        public static ServiceProvider Create(INonceStore nonceStore, IServiceProviderTokenManager tokenManager)
         {
             /**
              * The second parameter is the TokenManager
              */
-            return new ServiceProvider(SelfDescription, MvcApplication.Collections, MvcApplication.Collections, new OAuthMessageFactory(MvcApplication.Collections));
+            return new ServiceProvider(SelfDescription,  tokenManager, nonceStore, new OAuthMessageFactory(tokenManager));
         }
     }
 }

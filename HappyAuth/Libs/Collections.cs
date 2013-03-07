@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using DotNetOpenAuth.OAuth.Messages;
 using DotNetOpenAuth.Messaging.Bindings;
 using DotNetOpenAuth.OAuth.ChannelElements;
+using HappyAuth.Domain;
 using HappyAuth.Models;
 
 namespace HappyAuth.Libs
@@ -56,7 +58,7 @@ namespace HappyAuth.Libs
             {
                 throw new ArgumentException("token cannot be null");
             }
-            token.Authorize(user);
+            token.Authorize(user.Id.ToString(CultureInfo.InvariantCulture));
         }
 
         #region INonceStore

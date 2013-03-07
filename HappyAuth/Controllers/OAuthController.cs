@@ -30,7 +30,7 @@ namespace HappyAuth.Controllers
         public OAuthController()
             : base()
         {
-            serviceProvider = Libs.OAuthServiceProvider.Create();
+            serviceProvider = Domain.OAuthServiceProvider.Create(MvcApplication.Collections, MvcApplication.Collections);
             oAuthComponent = new Components.OAuthComponent(serviceProvider);            
         }
 
