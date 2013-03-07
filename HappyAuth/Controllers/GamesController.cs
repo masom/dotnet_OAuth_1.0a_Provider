@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
-using HappyAuth.Libs;
-using HappyAuth.Libs.Attributes;
+using HappyAuth.Controllers.Attributes;
+using HappyAuth.Domain;
+using HappyAuth.Domain.Attributes;
 
 namespace HappyAuth.Controllers
 {

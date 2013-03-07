@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using HappyAuth.Domain.Interfaces;
 
 namespace HappyAuth.Models
 {
@@ -9,7 +7,7 @@ namespace HappyAuth.Models
     /// A really happy User...
     /// </summary>
     [Serializable]
-    public class User
+    public class User : IOAuthUser
     {
         public long Id { get; set; }
         public String Username { get; set;}

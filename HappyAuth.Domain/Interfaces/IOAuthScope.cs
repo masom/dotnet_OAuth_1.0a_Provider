@@ -1,6 +1,6 @@
-﻿namespace HappyAuth.Libs.Interfaces
+﻿namespace HappyAuth.Domain.Interfaces
 {
-    interface IOAuthScope
+    public interface IOAuthScope
     {
         /// <summary>
         /// The required scope to access a resource.

@@ -7,9 +7,10 @@ using System.Web.Routing;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth.Messages;
 using DotNetOpenAuth.OAuth;
-using HappyAuth.Libs;
+using HappyAuth.Controllers.Attributes;
+using HappyAuth.Domain;
 using System.Security.Cryptography;
-using HappyAuth.Libs.Attributes;
+using HappyAuth.Models;
 
 namespace HappyAuth.Controllers.Components
 {
@@ -141,7 +142,7 @@ namespace HappyAuth.Controllers.Components
                 var issuedToken = ((ITokenContainingMessage)tokenResponse).Token;
                 var token = MvcApplication.Collections.GetTokenFromToken(issuedToken);
 
-                //Authorize the reques token but do not associate any users with it.
+                //Authorize the request token but do not associate any users with it.
                 MvcApplication.Collections.AuthorizeRequestToken(token, null);
             }
 
@@ -158,7 +159,7 @@ namespace HappyAuth.Controllers.Components
         /// </summary>
         /// <param name="routeData">Controller's <see cref="RouteData"/> possibly containing an <see cref="OAuthToken"/>.</param>
         /// <returns>The <see cref="Models.User"/> this request is being made on the behalf of.</returns>
-        public Models.User GetUser(RouteData routeData)
+        public User GetUser(RouteData routeData)
         {
             if (!routeData.Values.Keys.Contains(OAuthAuthorizationManager.TokenRouteKey))
             {
@@ -170,9 +171,9 @@ namespace HappyAuth.Controllers.Components
             {
                 return null;
             }
-
+            
             //AccessToken should really only contain a user id instead of a pure object reference.
-            return accessToken.User;
+            return MvcApplication.Collections.Users.FirstOrDefault(u => u.Id == accessToken.UserId);
         }
     }
 }

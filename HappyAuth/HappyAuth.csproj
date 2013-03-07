@@ -87,22 +87,13 @@
     <Compile Include="Controllers\Components\OAuthComponent.cs" />
     <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Controllers\GamesController.cs" />
+    <Compile Include="Controllers\Attributes\OAuthAuthorizationManager.cs" />
     <Compile Include="Controllers\OAuthController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Libs\Attributes\OAuthScope.cs" />
     <Compile Include="Libs\Collections.cs" />
-    <Compile Include="Libs\Interfaces\IOAuthScope.cs" />
-    <Compile Include="Libs\Attributes\OAuthAuthorizationManager.cs" />
-    <Compile Include="Libs\OAuthConsumer.cs" />
-    <Compile Include="Libs\OAuthMessageFactory.cs" />
-    <Compile Include="Libs\OAuthScopes.cs" />
-    <Compile Include="Libs\OAuthServiceProvider.cs" />
-    <Compile Include="Libs\OAuthToken.cs" />
-    <Compile Include="Libs\RequestScopedTokenMessage.cs" />
-    <Compile Include="Libs\TokenAuthorizationState.cs" />
     <Compile Include="Models\Character.cs" />
     <Compile Include="Models\Nonce.cs" />
     <Compile Include="Models\User.cs" />
@@ -175,6 +166,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HappyAuth.Domain\HappyAuth.Domain.csproj">
+      <Project>{808208C8-E5B0-4582-A84E-3FA658B96E92}</Project>
+      <Name>HappyAuth.Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

@@ -8,9 +8,11 @@ using System.Web.Mvc;
 using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth;
 using DotNetOpenAuth.OAuth.Messages;
-using HappyAuth.Libs.Interfaces;
+using HappyAuth.Domain;
+using HappyAuth.Domain.Attributes;
+using HappyAuth.Domain.Interfaces;
 
-namespace HappyAuth.Libs.Attributes
+namespace HappyAuth.Controllers.Attributes
 {
     /// <summary>
     /// Handles OAuth authentication against a resource. Can be a Controller or an Action.
@@ -56,9 +58,9 @@ namespace HappyAuth.Libs.Attributes
         public override void  OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
-            var serviceProvider = OAuthServiceProvider.Create();
+            var serviceProvider = OAuthServiceProvider.Create(MvcApplication.Collections, MvcApplication.Collections);
 
-            Authenticate(context, serviceProvider, request, _enforce);
+            Authenticate(context, serviceProvider, request);
             base.OnActionExecuting(context);
         }
 
@@ -150,7 +152,7 @@ namespace HappyAuth.Libs.Attributes
         /// <param name="httpRequest"></param>
         /// <exception cref="HttpException"></exception>
         /// <returns></returns>
-        private void Authenticate(ActionExecutingContext context, ServiceProvider provider, HttpRequestBase httpRequest, bool enforce)
+        private void Authenticate(ActionExecutingContext context, ServiceProvider provider, HttpRequestBase httpRequest)
         {
             AccessProtectedResourceRequest auth = null;
             try
@@ -174,7 +176,9 @@ namespace HappyAuth.Libs.Attributes
             }
 
             var accessToken = MvcApplication.Collections.GetTokenFromToken(auth.AccessToken);
-            VerifyScopeAccess(accessToken.User, context, accessToken.ScopeAsList);
+
+            var user = MvcApplication.Collections.Users.FirstOrDefault(u => u.Id == accessToken.UserId);
+            VerifyScopeAccess(user, context, accessToken.ScopeAsList);
             context.RouteData.Values.Add(TokenRouteKey, accessToken);
         }
     }
